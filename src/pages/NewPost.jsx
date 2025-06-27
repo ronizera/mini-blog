@@ -1,45 +1,64 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function NewPost() {
-  const [titulo, setTitulo] = useState("");
-  const [conteudo, setConteudo] = useState("");
+  const [titulo, setTitulo] = useState('');
+  const [conteudo, setConteudo] = useState('');
+  const [imagem, setImagem] = useState('');
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Novo post:", { titulo, conteudo });
+    const novoPost = {
+      titulo,
+      conteudo,
+      imagem
+    };
 
-    navigate("/");
-  }
+    try {
+      await fetch('http://localhost:3001/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoPost)
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao criar post:', error);
+    }
+  };
 
   return (
-    <div>
-      <h1>Criar Novo Post</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-lg">
+    <div className="max-w-xl mx-auto p-4 bg-white rounded-xl shadow">
+      <h1 className="text-2xl font-bold mb-4">Novo Post</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
           placeholder="Título"
           value={titulo}
           onChange={(e) => setTitulo(e.target.value)}
-          className="border p-2 rounded"
+          className="border rounded p-2"
           required
         />
-
         <textarea
           placeholder="Conteúdo"
           value={conteudo}
           onChange={(e) => setConteudo(e.target.value)}
-          className="border p-2 rounded h-32"
+          className="border rounded p-2 h-32"
           required
-        ></textarea>
-
+        />
+        <input
+          type="text"
+          placeholder="URL da Imagem (opcional)"
+          value={imagem}
+          onChange={(e) => setImagem(e.target.value)}
+          className="border rounded p-2"
+        />
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Criar Post
+          Publicar
         </button>
       </form>
     </div>
